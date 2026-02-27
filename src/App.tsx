@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Analytics } from '@vercel/analytics/react'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Layout } from '@/components/Layout'
 import { Loading } from '@/components/Loading'
@@ -96,6 +97,7 @@ export const App = () => {
             <AnimatedRoutes />
           </Suspense>
         </BrowserRouter>
+        <Analytics />
       </QueryClientProvider>
     </ErrorBoundary>
   )
