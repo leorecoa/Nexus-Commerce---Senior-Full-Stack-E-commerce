@@ -16,7 +16,7 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "prepare": "husky"
+    "prepare": "node scripts/prepare.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
