@@ -33,7 +33,7 @@ export const Navbar = () => {
     staleTime: 300_000,
   })
 
-  const bootstrapMutation = useMutation({
+  const { mutate: bootstrapTenant, isPending: isBootstrapPending } = useMutation({
     mutationFn: () => organizationService.bootstrapTenant('My Organization'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tenant-orgs', user?.id] })
@@ -58,13 +58,13 @@ export const Navbar = () => {
       return
     }
 
-    if (bootstrapMutation.isPending || bootstrapAttemptRef.current === user.id) {
+    if (isBootstrapPending || bootstrapAttemptRef.current === user.id) {
       return
     }
 
     bootstrapAttemptRef.current = user.id
-    bootstrapMutation.mutate()
-  }, [isAuthenticated, membershipOrganizations, setOrganizations, user?.id, bootstrapMutation, queryClient])
+    bootstrapTenant()
+  }, [isAuthenticated, membershipOrganizations, setOrganizations, user?.id, isBootstrapPending, bootstrapTenant])
 
   const handleOrgChange = (organizationId: string) => {
     setActiveOrganizationId(organizationId)

@@ -1,4 +1,11 @@
 export type UserRole = 'customer' | 'admin' | 'staff'
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: JsonValue }
+  | JsonValue[]
 
 export interface UserProfile {
   id: string
@@ -42,7 +49,7 @@ export interface Product {
   volume?: string
   type?: string
   image_url?: string
-  theme?: any
+  theme?: JsonValue
   category_id?: string
   is_active: boolean
   stock_quantity: number
@@ -75,7 +82,7 @@ export interface Order {
   notes?: string
   used_wallet_balance: number
   final_charge_amount?: number
-  shipping_address_snapshot: any
+  shipping_address_snapshot: JsonValue
   customer_name?: string
   customer_email?: string
   customer_phone?: string
@@ -131,7 +138,7 @@ export interface WalletTransaction {
   description?: string
   status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
   stripe_payment_intent_id?: string
-  metadata?: any
+  metadata?: JsonValue
   created_at: string
 }
 
