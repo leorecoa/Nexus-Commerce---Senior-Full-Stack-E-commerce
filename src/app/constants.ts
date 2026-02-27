@@ -1,0 +1,5 @@
+export const APP_NAME = 'TechStore'
+export const APP_DESCRIPTION = 'Premium Tech Products'
+export const CURRENCY = 'USD'
+export const CURRENCY_SYMBOL = '$'
+export const FALLBACK_PRODUCT_IMAGE = '/placeholder-product.svg'
