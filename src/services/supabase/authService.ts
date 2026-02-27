@@ -5,6 +5,8 @@ interface SignUpInput extends LoginInput {
   full_name?: string
 }
 
+export const AUTH_EVENT_STORAGE_KEY = 'nexus_auth_event'
+
 const mapAuthError = (message: string) => {
   const normalized = message.toLowerCase()
 
@@ -67,6 +69,15 @@ export const authService = {
   async signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
+    if ('BroadcastChannel' in window) {
+      const channel = new BroadcastChannel('nexus-auth-events')
+      channel.postMessage({ type: 'logout', at: Date.now() })
+      channel.close()
+    }
+    window.localStorage.setItem(
+      AUTH_EVENT_STORAGE_KEY,
+      JSON.stringify({ type: 'logout', at: Date.now() })
+    )
   },
 
   async getProfile(userId: string) {
@@ -74,15 +85,13 @@ export const authService = {
       .from('user_profiles')
       .select('*')
       .eq('id', userId)
-      .single()
+      .maybeSingle()
 
-    if (!error) {
+    if (!error && data) {
       return data
     }
 
-    const noProfile = error.code === 'PGRST116'
-
-    if (!noProfile) {
+    if (error && error.code !== 'PGRST116') {
       throw error
     }
 
@@ -90,7 +99,7 @@ export const authService = {
     const fallbackEmail = authUserData.user?.email
 
     if (!fallbackEmail) {
-      throw error
+      throw new Error('Authenticated user email not found for profile bootstrap')
     }
 
     const { data: createdProfile, error: createError } = await supabase
