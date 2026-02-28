@@ -38,6 +38,22 @@ export const Navbar = () => {
     staleTime: 300_000,
   })
 
+  const { data: canAccessAdmin } = useQuery({
+    queryKey: [
+      'permission-check',
+      user?.id,
+      activeOrganizationId,
+      'admin.dashboard.access',
+    ],
+    queryFn: () =>
+      organizationService.hasPermission(
+        activeOrganizationId!,
+        'admin.dashboard.access'
+      ),
+    enabled: Boolean(user?.id) && Boolean(activeOrganizationId),
+    staleTime: 60_000,
+  })
+
   const { mutate: bootstrapTenant, isPending: isBootstrapPending } =
     useMutation({
       mutationFn: () => organizationService.bootstrapTenant('My Organization'),
@@ -154,7 +170,7 @@ export const Navbar = () => {
 
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
-              {user?.role === 'admin' && (
+              {canAccessAdmin && (
                 <Link
                   to="/admin"
                   className="rounded-full border border-white/30 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/80"

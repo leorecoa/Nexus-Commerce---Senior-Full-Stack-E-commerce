@@ -239,7 +239,7 @@ const AnimatedRoutes = () => {
               path="/admin"
               element={
                 <Layout>
-                  <ProtectedRoute requireAdmin>
+                  <ProtectedRoute requiredPermission="admin.dashboard.access">
                     <AdminDashboard />
                   </ProtectedRoute>
                 </Layout>

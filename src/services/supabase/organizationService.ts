@@ -135,4 +135,14 @@ export const organizationService = {
       checkout_abandonment_rate: number
     }
   },
+
+  async hasPermission(organizationId: string, permissionKey: string) {
+    const { data, error } = await supabase.rpc('has_permission', {
+      p_org_id: organizationId,
+      p_permission_key: permissionKey,
+    })
+
+    if (error) throw error
+    return Boolean(data)
+  },
 }
