@@ -7,4 +7,7 @@ export const ROUTES = {
   LOGIN: '/login',
   AUTH_CALLBACK: '/auth/callback',
   ADMIN: '/admin',
+  ONBOARDING: '/onboarding',
+  PRICING: '/pricing',
+  DEMO: '/demo',
 } as const

@@ -17,7 +17,10 @@ interface TenantState {
 
 const TENANT_STORAGE_KEY = 'nexus_active_org_id'
 
-const hasSameOrganizations = (left: TenantOrganization[], right: TenantOrganization[]) => {
+const hasSameOrganizations = (
+  left: TenantOrganization[],
+  right: TenantOrganization[]
+) => {
   if (left.length !== right.length) {
     return false
   }
@@ -62,7 +65,9 @@ export const useTenantStore = create<TenantState>((set, get) => ({
     const currentActiveId = currentState.activeOrganizationId
 
     const stillExists = organizations.some(org => org.id === currentActiveId)
-    const nextActiveId = stillExists ? currentActiveId : organizations[0]?.id ?? null
+    const nextActiveId = stillExists
+      ? currentActiveId
+      : (organizations[0]?.id ?? null)
 
     if (
       hasSameOrganizations(currentState.organizations, organizations) &&

@@ -1,15 +1,43 @@
+import { useEffect, useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useCartStore } from '@/stores/cartStore'
 import { checkoutService } from '@/services/supabase/checkoutService'
+import { useTenantStore } from '@/stores/tenantStore'
 
 export const CheckoutPage = () => {
   const navigate = useNavigate()
+  const activeOrganizationId = useTenantStore(
+    state => state.activeOrganizationId
+  )
   const { items, clearCart, getTotal } = useCartStore()
+  const checkoutSessionRef = useRef<string>(crypto.randomUUID())
+
+  useEffect(() => {
+    if (!activeOrganizationId) return
+    checkoutService
+      .trackEvent({
+        organization_id: activeOrganizationId,
+        event_type: 'checkout_started',
+        session_id: checkoutSessionRef.current,
+        metadata: { item_count: items.length },
+      })
+      .catch(() => undefined)
+  }, [activeOrganizationId, items.length])
 
   const checkoutMutation = useMutation({
     mutationFn: checkoutService.createOrder,
     onSuccess: data => {
+      if (activeOrganizationId) {
+        checkoutService
+          .trackEvent({
+            organization_id: activeOrganizationId,
+            event_type: 'checkout_completed',
+            session_id: checkoutSessionRef.current,
+            metadata: { order_id: data },
+          })
+          .catch(() => undefined)
+      }
       clearCart()
       navigate(`/order-success/${data}`)
     },
@@ -58,8 +86,11 @@ export const CheckoutPage = () => {
       >
         {checkoutMutation.isPending ? 'Processing...' : 'Place Order'}
       </button>
-      {checkoutMutation.error && <p className="mt-4 text-center text-red-300">{checkoutMutation.error.message}</p>}
+      {checkoutMutation.error && (
+        <p className="mt-4 text-center text-red-300">
+          {checkoutMutation.error.message}
+        </p>
+      )}
     </div>
   )
 }
-

@@ -9,7 +9,9 @@ import { ImmersiveProductShowcase } from '@/features/immersive-shop/ImmersivePro
 import { useTenantStore } from '@/stores/tenantStore'
 
 export const HomePage = () => {
-  const activeOrganizationId = useTenantStore(state => state.activeOrganizationId)
+  const activeOrganizationId = useTenantStore(
+    state => state.activeOrganizationId
+  )
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products', activeOrganizationId],
@@ -17,7 +19,8 @@ export const HomePage = () => {
     staleTime: 60_000,
   })
 
-  const sceneOrganizationId = activeOrganizationId ?? products[0]?.organization_id
+  const sceneOrganizationId =
+    activeOrganizationId ?? products[0]?.organization_id
 
   const { data: scenes = [] } = useQuery({
     queryKey: ['story-scenes-public', sceneOrganizationId],
@@ -28,8 +31,12 @@ export const HomePage = () => {
   })
 
   const featured = useMemo(() => products.slice(0, 6), [products])
-  const [activeProductId, setActiveProductId] = useState<string | undefined>(undefined)
-  const setThemeFromProduct = useThemeEngineStore(state => state.setThemeFromProduct)
+  const [activeProductId, setActiveProductId] = useState<string | undefined>(
+    undefined
+  )
+  const setThemeFromProduct = useThemeEngineStore(
+    state => state.setThemeFromProduct
+  )
 
   useEffect(() => {
     if (!featured.length) {
@@ -40,7 +47,8 @@ export const HomePage = () => {
   }, [featured])
 
   const activeProduct = useMemo(
-    () => featured.find(product => product.id === activeProductId) ?? featured[0],
+    () =>
+      featured.find(product => product.id === activeProductId) ?? featured[0],
     [featured, activeProductId]
   )
 

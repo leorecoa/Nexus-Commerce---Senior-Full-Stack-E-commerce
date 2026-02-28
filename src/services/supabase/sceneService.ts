@@ -10,7 +10,8 @@ interface SceneInput {
   content: StoryScene['content']
 }
 
-const getActiveStoreId = async (organizationId: string) => organizationService.getActiveStoreId(organizationId)
+const getActiveStoreId = async (organizationId: string) =>
+  organizationService.getActiveStoreId(organizationId)
 
 const requireStoreId = async (organizationId: string) => {
   const storeId = await getActiveStoreId(organizationId)
@@ -69,7 +70,11 @@ export const sceneService = {
     return data as StoryScene
   },
 
-  async update(sceneId: string, organizationId: string, input: Partial<SceneInput>) {
+  async update(
+    sceneId: string,
+    organizationId: string,
+    input: Partial<SceneInput>
+  ) {
     const storeId = await requireStoreId(organizationId)
     const { data, error } = await supabase
       .from('story_scenes')

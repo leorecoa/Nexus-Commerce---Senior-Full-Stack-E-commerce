@@ -30,7 +30,12 @@ const stagger = {
 
 const item = {
   hidden: { opacity: 0, y: 10, filter: 'blur(4px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.35 } },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.35 },
+  },
 }
 
 type AuthMode = 'signin' | 'signup'
@@ -42,7 +47,10 @@ export const LoginPage = () => {
   const [nameError, setNameError] = useState('')
   const [signupNotice, setSignupNotice] = useState('')
 
-  const title = useMemo(() => (mode === 'signin' ? 'Sign in' : 'Create account'), [mode])
+  const title = useMemo(
+    () => (mode === 'signin' ? 'Sign in' : 'Create account'),
+    [mode]
+  )
 
   const {
     register,
@@ -60,7 +68,9 @@ export const LoginPage = () => {
   const signupMutation = useMutation({
     mutationFn: authService.signUp,
     onSuccess: () => {
-      setSignupNotice('Conta criada. Verifique seu email para confirmar o cadastro.')
+      setSignupNotice(
+        'Conta criada. Verifique seu email para confirmar o cadastro.'
+      )
       setMode('signin')
     },
   })
@@ -107,26 +117,36 @@ export const LoginPage = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(34,211,238,0.22),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(56,189,248,0.22),transparent_48%)]" />
           <div className="relative flex h-full flex-col justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-white/65">CineLaunch Commerce</p>
-              <h1 className="mt-6 text-7xl leading-[0.9]">Craft Luxury Funnels</h1>
+              <p className="text-xs uppercase tracking-[0.35em] text-white/65">
+                CineLaunch Commerce
+              </p>
+              <h1 className="mt-6 text-7xl leading-[0.9]">
+                Craft Luxury Funnels
+              </h1>
               <p className="mt-6 max-w-md text-base text-slate-200/90">
-                Transforme cada produto em uma campanha cinematografica com narrativa visual, performance e seguranca de
-                producao.
+                Transforme cada produto em uma campanha cinematografica com
+                narrativa visual, performance e seguranca de producao.
               </p>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-3">
                 <ShieldCheck size={18} className="text-cyan-300" />
-                <span className="text-sm text-white/85">Checkout transacional com RLS + RPC</span>
+                <span className="text-sm text-white/85">
+                  Checkout transacional com RLS + RPC
+                </span>
               </div>
               <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-3">
                 <Sparkles size={18} className="text-sky-300" />
-                <span className="text-sm text-white/85">Tema dinamico e experiencia premium por produto</span>
+                <span className="text-sm text-white/85">
+                  Tema dinamico e experiencia premium por produto
+                </span>
               </div>
               <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-3">
                 <Zap size={18} className="text-indigo-300" />
-                <span className="text-sm text-white/85">Arquitetura pronta para escalar como SaaS</span>
+                <span className="text-sm text-white/85">
+                  Arquitetura pronta para escalar como SaaS
+                </span>
               </div>
             </div>
           </div>
@@ -139,9 +159,13 @@ export const LoginPage = () => {
             transition={{ delay: 0.1, duration: 0.5 }}
             className="glass-panel mx-auto w-full max-w-md rounded-[2rem] p-7"
           >
-            <p className="text-xs uppercase tracking-[0.3em] text-white/55">Welcome back</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-white/55">
+              Welcome back
+            </p>
             <h2 className="mt-3 text-5xl">{title}</h2>
-            <p className="mt-3 text-sm text-white/70">Acesse seu workspace e publique campanhas de alto impacto.</p>
+            <p className="mt-3 text-sm text-white/70">
+              Acesse seu workspace e publique campanhas de alto impacto.
+            </p>
 
             <div className="mt-4 flex items-center gap-2 rounded-full border border-white/15 bg-slate-900/60 p-1">
               <button
@@ -152,7 +176,9 @@ export const LoginPage = () => {
                   setSignupNotice('')
                 }}
                 className={`w-1/2 rounded-full px-3 py-2 text-xs uppercase tracking-[0.16em] transition ${
-                  mode === 'signin' ? 'bg-white text-slate-900' : 'text-white/75'
+                  mode === 'signin'
+                    ? 'bg-white text-slate-900'
+                    : 'text-white/75'
                 }`}
               >
                 Sign in
@@ -165,7 +191,9 @@ export const LoginPage = () => {
                   setSignupNotice('')
                 }}
                 className={`w-1/2 rounded-full px-3 py-2 text-xs uppercase tracking-[0.16em] transition ${
-                  mode === 'signup' ? 'bg-white text-slate-900' : 'text-white/75'
+                  mode === 'signup'
+                    ? 'bg-white text-slate-900'
+                    : 'text-white/75'
                 }`}
               >
                 Create account
@@ -191,7 +219,9 @@ export const LoginPage = () => {
                     placeholder="Full name"
                     className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-4 py-3 outline-none transition focus:border-cyan-300/70"
                   />
-                  {nameError && <p className="mt-1 text-sm text-red-300">{nameError}</p>}
+                  {nameError && (
+                    <p className="mt-1 text-sm text-red-300">{nameError}</p>
+                  )}
                 </motion.div>
               )}
 
@@ -202,7 +232,11 @@ export const LoginPage = () => {
                   placeholder="Email"
                   className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-4 py-3 outline-none transition focus:border-cyan-300/70"
                 />
-                {errors.email && <p className="mt-1 text-sm text-red-300">{errors.email.message}</p>}
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-300">
+                    {errors.email.message}
+                  </p>
+                )}
               </motion.div>
 
               <motion.div variants={item}>
@@ -212,7 +246,11 @@ export const LoginPage = () => {
                   placeholder="Password"
                   className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-4 py-3 outline-none transition focus:border-cyan-300/70"
                 />
-                {errors.password && <p className="mt-1 text-sm text-red-300">{errors.password.message}</p>}
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-300">
+                    {errors.password.message}
+                  </p>
+                )}
               </motion.div>
 
               <motion.button
@@ -221,7 +259,9 @@ export const LoginPage = () => {
                 disabled={authPending}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[color:var(--theme-accent)] py-3 font-semibold text-slate-900 transition hover:brightness-110 disabled:opacity-70"
               >
-                {authPending && <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900 border-t-transparent" />}
+                {authPending && (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900 border-t-transparent" />
+                )}
                 {mode === 'signin'
                   ? loginMutation.isPending
                     ? 'Signing in...'
@@ -232,19 +272,28 @@ export const LoginPage = () => {
               </motion.button>
 
               {loginMutation.error && mode === 'signin' && (
-                <motion.p variants={item} className="text-center text-sm text-red-300">
+                <motion.p
+                  variants={item}
+                  className="text-center text-sm text-red-300"
+                >
                   {loginMutation.error.message}
                 </motion.p>
               )}
 
               {signupMutation.error && mode === 'signup' && (
-                <motion.p variants={item} className="text-center text-sm text-red-300">
+                <motion.p
+                  variants={item}
+                  className="text-center text-sm text-red-300"
+                >
                   {signupMutation.error.message}
                 </motion.p>
               )}
 
               {signupNotice && (
-                <motion.p variants={item} className="text-center text-sm text-emerald-300">
+                <motion.p
+                  variants={item}
+                  className="text-center text-sm text-emerald-300"
+                >
                   {signupNotice}
                 </motion.p>
               )}
@@ -259,8 +308,12 @@ export const LoginPage = () => {
                 disabled={googleMutation.isPending}
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 py-3 text-sm text-white/90 transition hover:border-white disabled:opacity-70"
               >
-                {googleMutation.isPending && <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />}
-                {googleMutation.isPending ? 'Redirecting...' : 'Sign in with Google'}
+                {googleMutation.isPending && (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                )}
+                {googleMutation.isPending
+                  ? 'Redirecting...'
+                  : 'Sign in with Google'}
               </motion.button>
             )}
           </motion.div>

@@ -6,15 +6,15 @@ interface MembershipRow {
   organization_id: string
   organizations:
     | {
-      id: string
-      name: string
-      slug: string
-    }
+        id: string
+        name: string
+        slug: string
+      }
     | {
-      id: string
-      name: string
-      slug: string
-    }[]
+        id: string
+        name: string
+        slug: string
+      }[]
     | null
 }
 
@@ -36,7 +36,9 @@ export const organizationService = {
 
     return (data as MembershipRow[])
       .map(row => {
-        const organization = Array.isArray(row.organizations) ? row.organizations[0] : row.organizations
+        const organization = Array.isArray(row.organizations)
+          ? row.organizations[0]
+          : row.organizations
         return { ...row, organizations: organization ?? null }
       })
       .filter(row => row.organizations !== null)
@@ -100,5 +102,37 @@ export const organizationService = {
 
     if (error) throw error
     return data as string
+  },
+
+  async getPlanSnapshot(organizationId: string) {
+    const { data, error } = await supabase.rpc('get_org_plan_snapshot', {
+      p_org_id: organizationId,
+    })
+    if (error) throw error
+    return data as {
+      plan_id: string
+      plan_name: string
+      status: string
+      limits: Record<string, number>
+      usage: Record<string, number>
+      trial_ends_at?: string | null
+      current_period_end?: string | null
+      price_monthly_cents: number
+    }
+  },
+
+  async getOrganizationKpis(organizationId: string) {
+    const { data, error } = await supabase.rpc('get_org_kpis', {
+      p_org_id: organizationId,
+    })
+    if (error) throw error
+    return data as {
+      window_days: number
+      checkout_started: number
+      checkout_completed: number
+      conversion_rate: number
+      aov: number
+      checkout_abandonment_rate: number
+    }
   },
 }

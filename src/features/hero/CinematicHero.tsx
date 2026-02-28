@@ -12,18 +12,26 @@ interface CinematicHeroProps {
   onSelectProduct: (productId: string) => void
 }
 
-export const CinematicHero = ({ products, activeProductId, onSelectProduct }: CinematicHeroProps) => {
+export const CinematicHero = ({
+  products,
+  activeProductId,
+  onSelectProduct,
+}: CinematicHeroProps) => {
   const { scrollYProgress } = useScroll()
   const y = useTransform(scrollYProgress, [0, 0.5], [0, -100])
 
   const activeProduct = useMemo(
-    () => products.find(product => product.id === activeProductId) ?? products[0],
+    () =>
+      products.find(product => product.id === activeProductId) ?? products[0],
     [activeProductId, products]
   )
 
   return (
     <section className="relative flex min-h-[110vh] items-center overflow-hidden px-5 pb-10 pt-28 md:px-10">
-      <motion.div className="pointer-events-none absolute inset-0" style={{ y }}>
+      <motion.div
+        className="pointer-events-none absolute inset-0"
+        style={{ y }}
+      >
         <div className="absolute -left-40 top-8 h-72 w-72 rounded-full bg-white/10 blur-[120px]" />
         <div className="absolute -right-16 top-40 h-80 w-80 rounded-full bg-[color:var(--theme-accent)]/20 blur-[140px]" />
       </motion.div>
@@ -47,9 +55,12 @@ export const CinematicHero = ({ products, activeProductId, onSelectProduct }: Ci
               exit={{ opacity: 0, y: -10, filter: 'blur(6px)' }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h1 className="text-6xl leading-[0.9] text-white md:text-8xl">{activeProduct?.name || 'Flagship Collection'}</h1>
+              <h1 className="text-6xl leading-[0.9] text-white md:text-8xl">
+                {activeProduct?.name || 'Flagship Collection'}
+              </h1>
               <p className="mt-6 max-w-xl text-lg text-slate-200 md:text-2xl">
-                {activeProduct?.description || 'Uma experiência premium com narrativa visual e performance sólida.'}
+                {activeProduct?.description ||
+                  'Uma experiência premium com narrativa visual e performance sólida.'}
               </p>
             </motion.div>
           </AnimatePresence>
@@ -61,7 +72,10 @@ export const CinematicHero = ({ products, activeProductId, onSelectProduct }: Ci
             className="mt-10 flex flex-wrap items-center gap-4"
           >
             <Link to="/products">
-              <CinematicButton tone="accent" className="inline-flex items-center gap-2">
+              <CinematicButton
+                tone="accent"
+                className="inline-flex items-center gap-2"
+              >
                 Comprar Agora
                 <ArrowRight size={18} />
               </CinematicButton>
@@ -80,7 +94,9 @@ export const CinematicHero = ({ products, activeProductId, onSelectProduct }: Ci
                     key={product.id}
                     onClick={() => onSelectProduct(product.id)}
                     className={`rounded-full px-4 py-2 text-sm transition-all ${
-                      isActive ? 'bg-white text-slate-900' : 'border border-white/30 text-white/80 hover:border-white/80'
+                      isActive
+                        ? 'bg-white text-slate-900'
+                        : 'border border-white/30 text-white/80 hover:border-white/80'
                     }`}
                   >
                     {product.name}
@@ -98,7 +114,12 @@ export const CinematicHero = ({ products, activeProductId, onSelectProduct }: Ci
             initial={{ opacity: 0, y: 40, rotateY: -14, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, rotateY: -5, scale: 1 }}
             exit={{ opacity: 0, y: -20, rotateY: 8, scale: 0.92 }}
-            transition={{ type: 'spring', stiffness: 120, damping: 20, mass: 0.65 }}
+            transition={{
+              type: 'spring',
+              stiffness: 120,
+              damping: 20,
+              mass: 0.65,
+            }}
           >
             <div className="absolute -inset-8 rounded-[2.5rem] bg-[color:var(--theme-accent)]/25 blur-3xl" />
             <div className="glass-panel relative rounded-[2.5rem] p-5">

@@ -19,7 +19,12 @@ export const Navbar = () => {
   const bootstrapAttemptRef = useRef<string | null>(null)
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
-  const { organizations, activeOrganizationId, setOrganizations, setActiveOrganizationId } = useTenantStore(state => ({
+  const {
+    organizations,
+    activeOrganizationId,
+    setOrganizations,
+    setActiveOrganizationId,
+  } = useTenantStore(state => ({
     organizations: state.organizations,
     activeOrganizationId: state.activeOrganizationId,
     setOrganizations: state.setOrganizations,
@@ -33,19 +38,23 @@ export const Navbar = () => {
     staleTime: 300_000,
   })
 
-  const { mutate: bootstrapTenant, isPending: isBootstrapPending } = useMutation({
-    mutationFn: () => organizationService.bootstrapTenant('My Organization'),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-orgs', user?.id] })
-    },
-    onError: error => {
-      addToast({
-        title: 'Falha no onboarding',
-        description: error instanceof Error ? error.message : 'Não foi possível criar sua organização inicial.',
-        variant: 'error',
-      })
-    },
-  })
+  const { mutate: bootstrapTenant, isPending: isBootstrapPending } =
+    useMutation({
+      mutationFn: () => organizationService.bootstrapTenant('My Organization'),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['tenant-orgs', user?.id] })
+      },
+      onError: error => {
+        addToast({
+          title: 'Falha no onboarding',
+          description:
+            error instanceof Error
+              ? error.message
+              : 'Não foi possível criar sua organização inicial.',
+          variant: 'error',
+        })
+      },
+    })
 
   useEffect(() => {
     if (!isAuthenticated || !user?.id || !membershipOrganizations) {
@@ -64,7 +73,14 @@ export const Navbar = () => {
 
     bootstrapAttemptRef.current = user.id
     bootstrapTenant()
-  }, [isAuthenticated, membershipOrganizations, setOrganizations, user?.id, isBootstrapPending, bootstrapTenant])
+  }, [
+    isAuthenticated,
+    membershipOrganizations,
+    setOrganizations,
+    user?.id,
+    isBootstrapPending,
+    bootstrapTenant,
+  ])
 
   const handleOrgChange = (organizationId: string) => {
     setActiveOrganizationId(organizationId)
@@ -93,18 +109,41 @@ export const Navbar = () => {
               className="max-w-44 rounded-full border border-white/20 bg-slate-900/80 px-3 py-2 text-xs uppercase tracking-[0.12em] text-white/85"
             >
               {organizations.map(org => (
-                <option key={org.id} value={org.id} className="bg-slate-900 text-white">
+                <option
+                  key={org.id}
+                  value={org.id}
+                  className="bg-slate-900 text-white"
+                >
                   {org.name}
                 </option>
               ))}
             </select>
           )}
 
-          <Link to="/products" className="text-sm uppercase tracking-[0.2em] text-white/80 transition hover:text-white">
+          <Link
+            to="/products"
+            className="text-sm uppercase tracking-[0.2em] text-white/80 transition hover:text-white"
+          >
             Products
           </Link>
+          <Link
+            to="/pricing"
+            className="text-sm uppercase tracking-[0.2em] text-white/80 transition hover:text-white"
+          >
+            Pricing
+          </Link>
+          <Link
+            to="/demo"
+            className="text-sm uppercase tracking-[0.2em] text-white/80 transition hover:text-white"
+          >
+            Demo
+          </Link>
 
-          <Link to="/cart" className="relative text-white/80 transition hover:text-white" aria-label="Cart">
+          <Link
+            to="/cart"
+            className="relative text-white/80 transition hover:text-white"
+            aria-label="Cart"
+          >
             <ShoppingCart size={24} />
             {cartCount > 0 && (
               <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--theme-accent)] text-xs font-bold text-slate-900">
@@ -116,10 +155,19 @@ export const Navbar = () => {
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
               {user?.role === 'admin' && (
-                <Link to="/admin" className="rounded-full border border-white/30 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/80">
+                <Link
+                  to="/admin"
+                  className="rounded-full border border-white/30 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/80"
+                >
                   Admin
                 </Link>
               )}
+              <Link
+                to="/onboarding"
+                className="rounded-full border border-white/30 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/80"
+              >
+                Setup
+              </Link>
               <CinematicButton
                 tone="ghost"
                 onClick={() => authService.signOut()}
@@ -131,7 +179,10 @@ export const Navbar = () => {
             </div>
           ) : (
             <Link to="/login">
-              <CinematicButton tone="accent" className="inline-flex items-center gap-2 px-5 py-2 text-xs uppercase tracking-[0.2em]">
+              <CinematicButton
+                tone="accent"
+                className="inline-flex items-center gap-2 px-5 py-2 text-xs uppercase tracking-[0.2em]"
+              >
                 <User size={14} />
                 Login
               </CinematicButton>

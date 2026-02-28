@@ -33,11 +33,12 @@ export const categoryService = {
     return data
   },
 
-  async update(id: string, category: Partial<CategoryInput>, organizationId?: string | null) {
-    let query = supabase
-      .from('categories')
-      .update(category)
-      .eq('id', id)
+  async update(
+    id: string,
+    category: Partial<CategoryInput>,
+    organizationId?: string | null
+  ) {
+    let query = supabase.from('categories').update(category).eq('id', id)
 
     if (organizationId) {
       query = query.eq('organization_id', organizationId)

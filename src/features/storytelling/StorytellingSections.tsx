@@ -23,30 +23,41 @@ const frames = [
   },
 ]
 
-export const StorytellingSections = ({ products, scenes = [] }: StorytellingSectionsProps) => {
+export const StorytellingSections = ({
+  products,
+  scenes = [],
+}: StorytellingSectionsProps) => {
   const sectionRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll()
 
   const depth = useTransform(scrollYProgress, [0.15, 0.95], [30, -30])
   const renderFrames = scenes.length
     ? scenes.map(scene => ({
-      key: scene.id,
-      title: String(scene.content.title || 'Story Scene'),
-      subtitle: String(scene.content.subtitle || 'Narrativa visual de produto premium.'),
-    }))
+        key: scene.id,
+        title: String(scene.content.title || 'Story Scene'),
+        subtitle: String(
+          scene.content.subtitle || 'Narrativa visual de produto premium.'
+        ),
+      }))
     : frames.map(frame => ({
-      key: frame.title,
-      title: frame.title,
-      subtitle: frame.subtitle,
-    }))
+        key: frame.title,
+        title: frame.title,
+        subtitle: frame.subtitle,
+      }))
 
   return (
-    <div ref={sectionRef} className="relative snap-story space-y-8 px-5 pb-24 md:px-10">
+    <div
+      ref={sectionRef}
+      className="relative snap-story space-y-8 px-5 pb-24 md:px-10"
+    >
       {renderFrames.map((frame, index) => {
         const product = products[index % Math.max(products.length, 1)]
 
         return (
-          <section key={frame.key} className="relative mx-auto min-h-[70vh] max-w-7xl">
+          <section
+            key={frame.key}
+            className="relative mx-auto min-h-[70vh] max-w-7xl"
+          >
             <motion.div
               style={{ y: depth }}
               initial={{ opacity: 0, filter: 'blur(14px)', scale: 0.98 }}
@@ -56,9 +67,15 @@ export const StorytellingSections = ({ products, scenes = [] }: StorytellingSect
               className="glass-panel grid min-h-[70vh] items-center gap-7 rounded-[2.2rem] p-7 md:grid-cols-[1.05fr_0.95fr] md:p-12"
             >
               <div>
-                <p className="mb-4 text-xs uppercase tracking-[0.3em] text-white/60">Scroll Story</p>
-                <h2 className="text-5xl leading-[0.95] text-white md:text-7xl">{frame.title}</h2>
-                <p className="mt-6 max-w-lg text-lg text-slate-200">{frame.subtitle}</p>
+                <p className="mb-4 text-xs uppercase tracking-[0.3em] text-white/60">
+                  Scroll Story
+                </p>
+                <h2 className="text-5xl leading-[0.95] text-white md:text-7xl">
+                  {frame.title}
+                </h2>
+                <p className="mt-6 max-w-lg text-lg text-slate-200">
+                  {frame.subtitle}
+                </p>
               </div>
 
               <motion.div

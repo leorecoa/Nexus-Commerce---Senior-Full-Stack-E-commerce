@@ -12,11 +12,14 @@ declare global {
   }
 }
 
-const SENTRY_SCRIPT_SRC = 'https://browser.sentry-cdn.com/7.120.3/bundle.tracing.min.js'
+const SENTRY_SCRIPT_SRC =
+  'https://browser.sentry-cdn.com/7.120.3/bundle.tracing.min.js'
 
 const loadSentryScript = () =>
   new Promise<void>((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${SENTRY_SCRIPT_SRC}"]`)
+    const existing = document.querySelector(
+      `script[src="${SENTRY_SCRIPT_SRC}"]`
+    )
     if (existing) {
       resolve()
       return
@@ -26,7 +29,8 @@ const loadSentryScript = () =>
     script.src = SENTRY_SCRIPT_SRC
     script.crossOrigin = 'anonymous'
     script.onload = () => resolve()
-    script.onerror = () => reject(new Error('Failed to load Sentry browser bundle'))
+    script.onerror = () =>
+      reject(new Error('Failed to load Sentry browser bundle'))
     document.head.appendChild(script)
   })
 
@@ -55,7 +59,10 @@ export const initMonitoring = async () => {
   }
 }
 
-export const captureException = (error: unknown, context?: MonitoringContext) => {
+export const captureException = (
+  error: unknown,
+  context?: MonitoringContext
+) => {
   if (window.Sentry) {
     window.Sentry.captureException(error, context)
     return
@@ -64,7 +71,10 @@ export const captureException = (error: unknown, context?: MonitoringContext) =>
   console.error('[captured-exception]', error, context ?? {})
 }
 
-export const captureMessage = (message: string, context?: MonitoringContext) => {
+export const captureMessage = (
+  message: string,
+  context?: MonitoringContext
+) => {
   if (window.Sentry) {
     window.Sentry.captureMessage(message, context)
     return

@@ -12,15 +12,23 @@ import { FALLBACK_PRODUCT_IMAGE } from '@/app/constants'
 const PAGE_SIZE = 6
 
 export const ProductsPage = () => {
-  const activeOrganizationId = useTenantStore(state => state.activeOrganizationId)
-  const { data: products = [], isLoading, error } = useQuery({
+  const activeOrganizationId = useTenantStore(
+    state => state.activeOrganizationId
+  )
+  const {
+    data: products = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['products', activeOrganizationId],
     queryFn: () => productService.getAll(activeOrganizationId),
     staleTime: 60_000,
   })
 
   const addItem = useCartStore(state => state.addItem)
-  const setThemeFromProduct = useThemeEngineStore(state => state.setThemeFromProduct)
+  const setThemeFromProduct = useThemeEngineStore(
+    state => state.setThemeFromProduct
+  )
   const [currentPage, setCurrentPage] = useState(1)
   const [infiniteMode, setInfiniteMode] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
@@ -85,7 +93,10 @@ export const ProductsPage = () => {
         </div>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="skeleton-premium h-[420px] rounded-[2rem]" />
+            <div
+              key={index}
+              className="skeleton-premium h-[420px] rounded-[2rem]"
+            />
           ))}
         </div>
       </div>
@@ -97,7 +108,9 @@ export const ProductsPage = () => {
       <div className="flex min-h-screen items-center justify-center px-6 text-center">
         <div className="glass-panel rounded-3xl p-8">
           <p className="text-2xl text-red-300">Erro ao carregar produtos</p>
-          <p className="mt-2 text-white/70">Verifique sua conexão com o banco de dados.</p>
+          <p className="mt-2 text-white/70">
+            Verifique sua conexão com o banco de dados.
+          </p>
         </div>
       </div>
     )
@@ -107,9 +120,15 @@ export const ProductsPage = () => {
     <div className="mx-auto min-h-screen w-full max-w-7xl px-5 pb-20 pt-28 md:px-10">
       <section className="mb-14 flex flex-wrap items-end justify-between gap-5">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-white/60">Immersive Shop</p>
-          <h1 className="text-6xl leading-[0.9] text-white md:text-7xl">Products</h1>
-          <p className="mt-3 text-white/70">Curadoria editorial com atmosfera dinâmica por produto.</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+            Immersive Shop
+          </p>
+          <h1 className="text-6xl leading-[0.9] text-white md:text-7xl">
+            Products
+          </h1>
+          <p className="mt-3 text-white/70">
+            Curadoria editorial com atmosfera dinâmica por produto.
+          </p>
         </div>
 
         <button
@@ -167,14 +186,19 @@ export const ProductsPage = () => {
 
                   <div className="mt-4 flex grow flex-col justify-between">
                     <div>
-                      <h2 className="text-3xl leading-none text-white">{product.name}</h2>
+                      <h2 className="text-3xl leading-none text-white">
+                        {product.name}
+                      </h2>
                       <p className="mt-2 line-clamp-2 text-sm text-white/70">
-                        {product.description || 'Produto premium com experiência de uso elevada.'}
+                        {product.description ||
+                          'Produto premium com experiência de uso elevada.'}
                       </p>
                     </div>
 
                     <div className="mt-4 flex items-center justify-between gap-3">
-                      <p className="text-2xl font-semibold text-white">${product.price.toFixed(2)}</p>
+                      <p className="text-2xl font-semibold text-white">
+                        ${product.price.toFixed(2)}
+                      </p>
                       <CinematicButton
                         tone="accent"
                         className="inline-flex items-center gap-2 px-5 py-2 text-sm"
@@ -196,7 +220,9 @@ export const ProductsPage = () => {
         <div className="glass-panel mt-8 rounded-3xl p-8 text-center">
           <Sparkles className="mx-auto mb-4 text-white/60" size={38} />
           <h2 className="text-3xl text-white">Catálogo em atualização</h2>
-          <p className="mt-2 text-white/65">Novos produtos premium serão publicados em breve.</p>
+          <p className="mt-2 text-white/65">
+            Novos produtos premium serão publicados em breve.
+          </p>
         </div>
       )}
 

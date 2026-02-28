@@ -99,7 +99,9 @@ export const authService = {
     const fallbackEmail = authUserData.user?.email
 
     if (!fallbackEmail) {
-      throw new Error('Authenticated user email not found for profile bootstrap')
+      throw new Error(
+        'Authenticated user email not found for profile bootstrap'
+      )
     }
 
     const { data: createdProfile, error: createError } = await supabase

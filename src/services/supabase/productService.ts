@@ -6,7 +6,10 @@ interface GetProductsOptions {
 }
 
 export const productService = {
-  async getAll(organizationId?: string | null, options: GetProductsOptions = {}) {
+  async getAll(
+    organizationId?: string | null,
+    options: GetProductsOptions = {}
+  ) {
     const includeInactive = options.includeInactive ?? false
 
     let query = supabase
@@ -28,10 +31,7 @@ export const productService = {
   },
 
   async getById(id: string, organizationId?: string | null) {
-    let query = supabase
-      .from('products')
-      .select('*')
-      .eq('id', id)
+    let query = supabase.from('products').select('*').eq('id', id)
 
     if (organizationId) {
       query = query.eq('organization_id', organizationId)
@@ -52,11 +52,12 @@ export const productService = {
     return data
   },
 
-  async update(id: string, product: Partial<ProductInput>, organizationId?: string | null) {
-    let query = supabase
-      .from('products')
-      .update(product)
-      .eq('id', id)
+  async update(
+    id: string,
+    product: Partial<ProductInput>,
+    organizationId?: string | null
+  ) {
+    let query = supabase.from('products').update(product).eq('id', id)
 
     if (organizationId) {
       query = query.eq('organization_id', organizationId)
@@ -85,7 +86,9 @@ export const productService = {
       .from('products')
       .upload(fileName, file)
     if (error) throw error
-    const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(data.path)
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('products').getPublicUrl(data.path)
     return publicUrl
   },
 }

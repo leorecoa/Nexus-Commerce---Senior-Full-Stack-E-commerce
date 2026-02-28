@@ -52,7 +52,11 @@ export const Toaster = () => {
                 <span className="mt-[2px]">{variantIcon[toast.variant]}</span>
                 <div>
                   <p className="text-sm font-semibold">{toast.title}</p>
-                  {toast.description && <p className="mt-1 text-xs opacity-90">{toast.description}</p>}
+                  {toast.description && (
+                    <p className="mt-1 text-xs opacity-90">
+                      {toast.description}
+                    </p>
+                  )}
                 </div>
               </div>
               <button

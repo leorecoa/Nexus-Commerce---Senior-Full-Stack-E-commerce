@@ -19,7 +19,13 @@ export const useToastStore = create<ToastState>(set => ({
   toasts: [],
   addToast: toast =>
     set(state => ({
-      toasts: [...state.toasts, { ...toast, id: `${Date.now()}-${Math.random().toString(16).slice(2)}` }],
+      toasts: [
+        ...state.toasts,
+        {
+          ...toast,
+          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        },
+      ],
     })),
   removeToast: id =>
     set(state => ({

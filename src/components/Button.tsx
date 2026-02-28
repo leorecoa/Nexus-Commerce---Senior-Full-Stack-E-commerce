@@ -5,15 +5,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean
 }
 
-export const Button = ({ 
-  children, 
-  variant = 'primary', 
-  isLoading, 
+export const Button = ({
+  children,
+  variant = 'primary',
+  isLoading,
   disabled,
   className = '',
-  ...props 
+  ...props
 }: ButtonProps) => {
-  const baseStyles = 'px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50'
+  const baseStyles =
+    'px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50'
   const variants = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700',
     secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',

@@ -42,4 +42,14 @@ export const checkoutService = {
     if (error) throw error
     return data
   },
+
+  async trackEvent(input: {
+    organization_id: string
+    event_type: 'checkout_started' | 'checkout_completed'
+    session_id: string
+    metadata?: Record<string, unknown>
+  }) {
+    const { error } = await supabase.from('checkout_events').insert(input)
+    if (error) throw error
+  },
 }

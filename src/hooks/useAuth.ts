@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/authStore'
 import { useTenantStore } from '@/stores/tenantStore'
-import { AUTH_EVENT_STORAGE_KEY, authService } from '@/services/supabase/authService'
+import {
+  AUTH_EVENT_STORAGE_KEY,
+  authService,
+} from '@/services/supabase/authService'
 
 export const useAuth = () => {
   const { user, setUser } = useAuthStore()
@@ -16,21 +19,32 @@ export const useAuth = () => {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        authService.getProfile(session.user.id).then(setUser).catch(console.error)
+        authService
+          .getProfile(session.user.id)
+          .then(setUser)
+          .catch(console.error)
       } else {
         resetAuthState()
       }
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        authService.getProfile(session.user.id).then(setUser).catch(console.error)
+        authService
+          .getProfile(session.user.id)
+          .then(setUser)
+          .catch(console.error)
       } else {
         resetAuthState()
       }
     })
 
-    const authChannel = 'BroadcastChannel' in window ? new BroadcastChannel('nexus-auth-events') : null
+    const authChannel =
+      'BroadcastChannel' in window
+        ? new BroadcastChannel('nexus-auth-events')
+        : null
 
     const onStorage = (event: StorageEvent) => {
       if (event.key === AUTH_EVENT_STORAGE_KEY && event.newValue) {
@@ -47,7 +61,10 @@ export const useAuth = () => {
     const onFocus = () => {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session?.user) {
-          authService.getProfile(session.user.id).then(setUser).catch(console.error)
+          authService
+            .getProfile(session.user.id)
+            .then(setUser)
+            .catch(console.error)
           return
         }
         resetAuthState()
