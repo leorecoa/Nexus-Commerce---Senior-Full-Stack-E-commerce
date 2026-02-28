@@ -172,6 +172,8 @@ export interface StoryScene {
   position: number
   template_version: number
   template_key?: string | null
+  experiment_id?: string | null
+  variant_id?: string | null
   content: {
     title?: string
     subtitle?: string

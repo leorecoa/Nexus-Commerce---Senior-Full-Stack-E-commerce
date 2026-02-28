@@ -3,9 +3,12 @@ import { useQuery } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ShoppingCart, Sparkles } from 'lucide-react'
 import { productService } from '@/services/supabase/productService'
+import { experimentService } from '@/services/supabase/experimentService'
 import { useCartStore } from '@/stores/cartStore'
 import { useTenantStore } from '@/stores/tenantStore'
 import { useThemeEngineStore } from '@/features/theme-engine/themeStore'
+import { useExperimentStore } from '@/stores/experimentStore'
+import { useAuthStore } from '@/stores/authStore'
 import { CinematicButton } from '@/components/cinematic/CinematicButton'
 import { FALLBACK_PRODUCT_IMAGE } from '@/app/constants'
 
@@ -26,6 +29,9 @@ export const ProductsPage = () => {
   })
 
   const addItem = useCartStore(state => state.addItem)
+  const userId = useAuthStore(state => state.user?.id)
+  const sessionId = useExperimentStore(state => state.sessionId)
+  const activeVariant = useExperimentStore(state => state.activeVariant)
   const setThemeFromProduct = useThemeEngineStore(
     state => state.setThemeFromProduct
   )
@@ -202,7 +208,21 @@ export const ProductsPage = () => {
                       <CinematicButton
                         tone="accent"
                         className="inline-flex items-center gap-2 px-5 py-2 text-sm"
-                        onClick={() => addItem(product, 1)}
+                        onClick={() => {
+                          addItem(product, 1)
+                          if (!activeOrganizationId) return
+                          experimentService
+                            .trackVariantEvent({
+                              organizationId: activeOrganizationId,
+                              eventType: 'add_to_cart',
+                              sessionId,
+                              userId,
+                              experimentId: activeVariant.experimentId,
+                              variantId: activeVariant.variantId,
+                              metadata: { product_id: product.id },
+                            })
+                            .catch(() => undefined)
+                        }}
                       >
                         <ShoppingCart size={16} />
                         Add

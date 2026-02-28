@@ -10,12 +10,14 @@ interface CinematicHeroProps {
   products: Product[]
   activeProductId?: string
   onSelectProduct: (productId: string) => void
+  onPrimaryCtaClick?: () => void
 }
 
 export const CinematicHero = ({
   products,
   activeProductId,
   onSelectProduct,
+  onPrimaryCtaClick,
 }: CinematicHeroProps) => {
   const { scrollYProgress } = useScroll()
   const y = useTransform(scrollYProgress, [0, 0.5], [0, -100])
@@ -75,6 +77,7 @@ export const CinematicHero = ({
               <CinematicButton
                 tone="accent"
                 className="inline-flex items-center gap-2"
+                onClick={onPrimaryCtaClick}
               >
                 Comprar Agora
                 <ArrowRight size={18} />

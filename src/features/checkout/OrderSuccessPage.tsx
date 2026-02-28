@@ -1,9 +1,35 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { CheckCircle } from 'lucide-react'
+import { experimentService } from '@/services/supabase/experimentService'
+import { useTenantStore } from '@/stores/tenantStore'
+import { useExperimentStore } from '@/stores/experimentStore'
+import { useAuthStore } from '@/stores/authStore'
 
 export const OrderSuccessPage = () => {
   const { orderId } = useParams()
   const navigate = useNavigate()
+  const activeOrganizationId = useTenantStore(
+    state => state.activeOrganizationId
+  )
+  const sessionId = useExperimentStore(state => state.sessionId)
+  const activeVariant = useExperimentStore(state => state.activeVariant)
+  const userId = useAuthStore(state => state.user?.id)
+
+  useEffect(() => {
+    if (!activeOrganizationId) return
+    experimentService
+      .trackVariantEvent({
+        organizationId: activeOrganizationId,
+        eventType: 'conversion',
+        sessionId,
+        userId,
+        experimentId: activeVariant.experimentId,
+        variantId: activeVariant.variantId,
+        metadata: { order_id: orderId },
+      })
+      .catch(() => undefined)
+  }, [activeOrganizationId, sessionId, userId, activeVariant, orderId])
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 text-white">

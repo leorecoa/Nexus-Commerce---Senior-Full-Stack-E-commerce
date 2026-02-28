@@ -3,18 +3,36 @@ import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useCartStore } from '@/stores/cartStore'
 import { checkoutService } from '@/services/supabase/checkoutService'
+import { experimentService } from '@/services/supabase/experimentService'
 import { useTenantStore } from '@/stores/tenantStore'
+import { useExperimentStore } from '@/stores/experimentStore'
+import { useAuthStore } from '@/stores/authStore'
 
 export const CheckoutPage = () => {
   const navigate = useNavigate()
   const activeOrganizationId = useTenantStore(
     state => state.activeOrganizationId
   )
+  const userId = useAuthStore(state => state.user?.id)
+  const sessionId = useExperimentStore(state => state.sessionId)
+  const activeVariant = useExperimentStore(state => state.activeVariant)
   const { items, clearCart, getTotal } = useCartStore()
   const checkoutSessionRef = useRef<string>(crypto.randomUUID())
 
   useEffect(() => {
     if (!activeOrganizationId) return
+    experimentService
+      .trackVariantEvent({
+        organizationId: activeOrganizationId,
+        eventType: 'checkout_start',
+        sessionId,
+        userId,
+        experimentId: activeVariant.experimentId,
+        variantId: activeVariant.variantId,
+        metadata: { item_count: items.length },
+      })
+      .catch(() => undefined)
+
     checkoutService
       .trackEvent({
         organization_id: activeOrganizationId,
@@ -23,7 +41,7 @@ export const CheckoutPage = () => {
         metadata: { item_count: items.length },
       })
       .catch(() => undefined)
-  }, [activeOrganizationId, items.length])
+  }, [activeOrganizationId, items.length, sessionId, userId, activeVariant])
 
   const checkoutMutation = useMutation({
     mutationFn: checkoutService.createOrder,
