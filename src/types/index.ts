@@ -170,6 +170,8 @@ export interface StoryScene {
   product_id?: string | null
   scene_type: 'hero' | 'feature' | 'proof' | 'cta'
   position: number
+  template_version: number
+  template_key?: string | null
   content: {
     title?: string
     subtitle?: string
@@ -179,6 +181,31 @@ export interface StoryScene {
   is_active: boolean
   created_at: string
   updated_at: string
+}
+
+export interface CampaignTemplate {
+  id: string
+  key: string
+  name: string
+  description?: string | null
+  style_family: string
+  scene_bundle: JsonValue
+  is_active: boolean
+  is_system: boolean
+  organization_id?: string | null
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface StoreSceneVersion {
+  id: string
+  store_id: string
+  template_version: number
+  source_template_key?: string | null
+  scenes_snapshot: JsonValue
+  created_by?: string | null
+  created_at: string
 }
 
 export interface StoreTheme {

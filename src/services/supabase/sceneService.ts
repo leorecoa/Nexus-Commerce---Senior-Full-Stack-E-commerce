@@ -1,4 +1,4 @@
-﻿import { StoryScene } from '@/types'
+import { CampaignTemplate, StoreSceneVersion, StoryScene } from '@/types'
 import { organizationService } from './organizationService'
 import { supabase } from '@/lib/supabase'
 
@@ -97,5 +97,60 @@ export const sceneService = {
       .eq('store_id', storeId)
 
     if (error) throw error
+  },
+
+  async getTemplates(organizationId: string) {
+    const { data, error } = await supabase
+      .from('campaign_templates')
+      .select('*')
+      .eq('is_active', true)
+      .or(`organization_id.is.null,organization_id.eq.${organizationId}`)
+      .order('is_system', { ascending: false })
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data as CampaignTemplate[]
+  },
+
+  async applyTemplate(
+    organizationId: string,
+    templateKey: string,
+    productId?: string
+  ) {
+    const { data, error } = await supabase.rpc('apply_campaign_template', {
+      p_org_id: organizationId,
+      p_template_key: templateKey,
+      p_product_id: productId ?? null,
+    })
+
+    if (error) throw error
+    return Number(data)
+  },
+
+  async getTemplateVersions(organizationId: string) {
+    const storeId = await getActiveStoreId(organizationId)
+    if (!storeId) return []
+
+    const { data, error } = await supabase
+      .from('store_scene_versions')
+      .select('*')
+      .eq('store_id', storeId)
+      .order('template_version', { ascending: false })
+
+    if (error) throw error
+    return data as StoreSceneVersion[]
+  },
+
+  async rollbackToVersion(organizationId: string, targetVersion: number) {
+    const { data, error } = await supabase.rpc(
+      'rollback_store_template_version',
+      {
+        p_org_id: organizationId,
+        p_target_version: targetVersion,
+      }
+    )
+
+    if (error) throw error
+    return Number(data)
   },
 }
