@@ -2,11 +2,13 @@ import { FormEvent, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { productService } from '@/services/supabase/productService'
 import { categoryService } from '@/services/supabase/categoryService'
+import { organizationService } from '@/services/supabase/organizationService'
 import { useTenantStore } from '@/stores/tenantStore'
 import { useToastStore } from '@/stores/toastStore'
 import { Category, Product } from '@/types'
 import { Save, Trash2, Edit, Plus, Upload, Search } from 'lucide-react'
 import { SceneBuilderSection } from './SceneBuilderSection'
+import { BrandingSection } from './BrandingSection'
 
 interface CategoryFormState {
   name: string
@@ -60,21 +62,31 @@ const slugify = (value: string) =>
     .replace(/(^-|-$)/g, '')
 
 export const AdminDashboard = () => {
-  const activeOrganizationId = useTenantStore(state => state.activeOrganizationId)
+  const activeOrganizationId = useTenantStore(
+    state => state.activeOrganizationId
+  )
   const addToast = useToastStore(state => state.addToast)
   const queryClient = useQueryClient()
 
-  const [categoryForm, setCategoryForm] = useState<CategoryFormState>(emptyCategoryForm)
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null)
+  const [categoryForm, setCategoryForm] =
+    useState<CategoryFormState>(emptyCategoryForm)
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(
+    null
+  )
   const [categorySearch, setCategorySearch] = useState('')
 
-  const [productForm, setProductForm] = useState<ProductFormState>(emptyProductForm)
+  const [productForm, setProductForm] =
+    useState<ProductFormState>(emptyProductForm)
   const [editingProductId, setEditingProductId] = useState<string | null>(null)
   const [productSearch, setProductSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [statusFilter, setStatusFilter] = useState<
+    'all' | 'active' | 'inactive'
+  >('all')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const [confirmDelete, setConfirmDelete] = useState<ConfirmDeleteState | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<ConfirmDeleteState | null>(
+    null
+  )
 
   const { data: categories = [] } = useQuery({
     queryKey: ['categories-admin', activeOrganizationId],
@@ -84,7 +96,21 @@ export const AdminDashboard = () => {
 
   const { data: products = [] } = useQuery({
     queryKey: ['products-admin', activeOrganizationId],
-    queryFn: () => productService.getAll(activeOrganizationId, { includeInactive: true }),
+    queryFn: () =>
+      productService.getAll(activeOrganizationId, { includeInactive: true }),
+    enabled: Boolean(activeOrganizationId),
+  })
+
+  const { data: kpis } = useQuery({
+    queryKey: ['org-kpis', activeOrganizationId],
+    queryFn: () =>
+      organizationService.getOrganizationKpis(activeOrganizationId!),
+    enabled: Boolean(activeOrganizationId),
+  })
+
+  const { data: planSnapshot } = useQuery({
+    queryKey: ['org-plan-snapshot', activeOrganizationId],
+    queryFn: () => organizationService.getPlanSnapshot(activeOrganizationId!),
     enabled: Boolean(activeOrganizationId),
   })
 
@@ -106,7 +132,8 @@ export const AdminDashboard = () => {
     onError: error => {
       addToast({
         title: 'Erro ao enviar imagem',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
+        description:
+          error instanceof Error ? error.message : 'Tente novamente.',
         variant: 'error',
       })
     },
@@ -126,14 +153,19 @@ export const AdminDashboard = () => {
     },
     onSuccess: () => {
       setCategoryForm(emptyCategoryForm)
-      queryClient.invalidateQueries({ queryKey: ['categories-admin', activeOrganizationId] })
-      queryClient.invalidateQueries({ queryKey: ['categories', activeOrganizationId] })
+      queryClient.invalidateQueries({
+        queryKey: ['categories-admin', activeOrganizationId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['categories', activeOrganizationId],
+      })
       addToast({ title: 'Categoria criada', variant: 'success' })
     },
     onError: error => {
       addToast({
         title: 'Erro ao criar categoria',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
+        description:
+          error instanceof Error ? error.message : 'Tente novamente.',
         variant: 'error',
       })
     },
@@ -155,30 +187,43 @@ export const AdminDashboard = () => {
     onSuccess: () => {
       setCategoryForm(emptyCategoryForm)
       setEditingCategoryId(null)
-      queryClient.invalidateQueries({ queryKey: ['categories-admin', activeOrganizationId] })
-      queryClient.invalidateQueries({ queryKey: ['categories', activeOrganizationId] })
+      queryClient.invalidateQueries({
+        queryKey: ['categories-admin', activeOrganizationId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['categories', activeOrganizationId],
+      })
       addToast({ title: 'Categoria atualizada', variant: 'success' })
     },
     onError: error => {
       addToast({
         title: 'Erro ao atualizar categoria',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
+        description:
+          error instanceof Error ? error.message : 'Tente novamente.',
         variant: 'error',
       })
     },
   })
 
   const deleteCategoryMutation = useMutation({
-    mutationFn: (categoryId: string) => categoryService.delete(categoryId, activeOrganizationId),
+    mutationFn: (categoryId: string) =>
+      categoryService.delete(categoryId, activeOrganizationId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories-admin', activeOrganizationId] })
-      queryClient.invalidateQueries({ queryKey: ['categories', activeOrganizationId] })
+      queryClient.invalidateQueries({
+        queryKey: ['categories-admin', activeOrganizationId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['categories', activeOrganizationId],
+      })
       addToast({ title: 'Categoria removida', variant: 'success' })
     },
     onError: error => {
       addToast({
         title: 'Erro ao remover categoria',
-        description: error instanceof Error ? error.message : 'Categoria pode estar em uso por produtos.',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Categoria pode estar em uso por produtos.',
         variant: 'error',
       })
     },
@@ -204,14 +249,19 @@ export const AdminDashboard = () => {
     },
     onSuccess: () => {
       setProductForm(emptyProductForm)
-      queryClient.invalidateQueries({ queryKey: ['products-admin', activeOrganizationId] })
-      queryClient.invalidateQueries({ queryKey: ['products', activeOrganizationId] })
+      queryClient.invalidateQueries({
+        queryKey: ['products-admin', activeOrganizationId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['products', activeOrganizationId],
+      })
       addToast({ title: 'Produto criado', variant: 'success' })
     },
     onError: error => {
       addToast({
         title: 'Erro ao criar produto',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
+        description:
+          error instanceof Error ? error.message : 'Tente novamente.',
         variant: 'error',
       })
     },
@@ -239,30 +289,41 @@ export const AdminDashboard = () => {
     onSuccess: () => {
       setProductForm(emptyProductForm)
       setEditingProductId(null)
-      queryClient.invalidateQueries({ queryKey: ['products-admin', activeOrganizationId] })
-      queryClient.invalidateQueries({ queryKey: ['products', activeOrganizationId] })
+      queryClient.invalidateQueries({
+        queryKey: ['products-admin', activeOrganizationId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['products', activeOrganizationId],
+      })
       addToast({ title: 'Produto atualizado', variant: 'success' })
     },
     onError: error => {
       addToast({
         title: 'Erro ao atualizar produto',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
+        description:
+          error instanceof Error ? error.message : 'Tente novamente.',
         variant: 'error',
       })
     },
   })
 
   const deleteProductMutation = useMutation({
-    mutationFn: (productId: string) => productService.delete(productId, activeOrganizationId),
+    mutationFn: (productId: string) =>
+      productService.delete(productId, activeOrganizationId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products-admin', activeOrganizationId] })
-      queryClient.invalidateQueries({ queryKey: ['products', activeOrganizationId] })
+      queryClient.invalidateQueries({
+        queryKey: ['products-admin', activeOrganizationId],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['products', activeOrganizationId],
+      })
       addToast({ title: 'Produto removido', variant: 'success' })
     },
     onError: error => {
       addToast({
         title: 'Erro ao remover produto',
-        description: error instanceof Error ? error.message : 'Tente novamente.',
+        description:
+          error instanceof Error ? error.message : 'Tente novamente.',
         variant: 'error',
       })
     },
@@ -325,7 +386,11 @@ export const AdminDashboard = () => {
   }
 
   const requestDeleteCategory = (category: Category) => {
-    setConfirmDelete({ entity: 'category', id: category.id, name: category.name })
+    setConfirmDelete({
+      entity: 'category',
+      id: category.id,
+      name: category.name,
+    })
   }
 
   const requestDeleteProduct = (product: Product) => {
@@ -410,23 +475,71 @@ export const AdminDashboard = () => {
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE))
   const safePage = Math.min(currentPage, totalPages)
-  const paginatedProducts = filteredProducts.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+  const paginatedProducts = filteredProducts.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE
+  )
 
-  const isSavingCategory = createCategoryMutation.isPending || updateCategoryMutation.isPending
-  const isSavingProduct = createProductMutation.isPending || updateProductMutation.isPending
+  const isSavingCategory =
+    createCategoryMutation.isPending || updateCategoryMutation.isPending
+  const isSavingProduct =
+    createProductMutation.isPending || updateProductMutation.isPending
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-28 text-white">
       <h1 className="mb-8 text-5xl">Admin Dashboard</h1>
 
+      {activeOrganizationId && kpis && planSnapshot && (
+        <section className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="glass-panel rounded-2xl p-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-white/60">
+              Conversion 30d
+            </p>
+            <p className="mt-2 text-3xl">{kpis.conversion_rate}%</p>
+          </div>
+          <div className="glass-panel rounded-2xl p-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-white/60">
+              AOV
+            </p>
+            <p className="mt-2 text-3xl">${Number(kpis.aov).toFixed(2)}</p>
+          </div>
+          <div className="glass-panel rounded-2xl p-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-white/60">
+              Checkout abandonment
+            </p>
+            <p className="mt-2 text-3xl">{kpis.checkout_abandonment_rate}%</p>
+          </div>
+          <div className="glass-panel rounded-2xl p-4">
+            <p className="text-xs uppercase tracking-[0.16em] text-white/60">
+              Plan
+            </p>
+            <p className="mt-2 text-2xl">{planSnapshot.plan_name}</p>
+            <p className="mt-1 text-xs text-white/65">{planSnapshot.status}</p>
+            <p className="mt-2 text-xs text-white/70">
+              stores {planSnapshot.usage.stores}/{planSnapshot.limits.stores} |
+              scenes {planSnapshot.usage.scenes}/{planSnapshot.limits.scenes}
+            </p>
+            <p className="text-xs text-white/70">
+              products {planSnapshot.usage.products}/
+              {planSnapshot.limits.products} | members{' '}
+              {planSnapshot.usage.members}/{planSnapshot.limits.members}
+            </p>
+          </div>
+        </section>
+      )}
+
       {!activeOrganizationId && (
-        <div className="glass-panel rounded-2xl p-5 text-white/80">Selecione uma organizacao para administrar produtos e categorias.</div>
+        <div className="glass-panel rounded-2xl p-5 text-white/80">
+          Selecione uma organizacao para administrar produtos e categorias.
+        </div>
       )}
 
       {activeOrganizationId && (
         <div className="grid gap-6 lg:grid-cols-2">
           <section className="glass-panel rounded-3xl p-6">
-            <h2 className="text-3xl">{editingCategoryId ? 'Editar Categoria' : 'Nova Categoria'}</h2>
+            <h2 className="text-3xl">
+              {editingCategoryId ? 'Editar Categoria' : 'Nova Categoria'}
+            </h2>
             <form onSubmit={handleCategorySubmit} className="mt-5 space-y-3">
               <input
                 value={categoryForm.name}
@@ -442,13 +555,23 @@ export const AdminDashboard = () => {
               />
               <input
                 value={categoryForm.slug}
-                onChange={event => setCategoryForm(prev => ({ ...prev, slug: slugify(event.target.value) }))}
+                onChange={event =>
+                  setCategoryForm(prev => ({
+                    ...prev,
+                    slug: slugify(event.target.value),
+                  }))
+                }
                 placeholder="slug"
                 className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
               />
               <textarea
                 value={categoryForm.description}
-                onChange={event => setCategoryForm(prev => ({ ...prev, description: event.target.value }))}
+                onChange={event =>
+                  setCategoryForm(prev => ({
+                    ...prev,
+                    description: event.target.value,
+                  }))
+                }
                 placeholder="Descricao"
                 rows={3}
                 className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
@@ -478,7 +601,10 @@ export const AdminDashboard = () => {
           <section className="glass-panel rounded-3xl p-6">
             <h2 className="text-3xl">Categorias</h2>
             <div className="relative mt-4">
-              <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/50" />
+              <Search
+                size={15}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/50"
+              />
               <input
                 value={categorySearch}
                 onChange={event => setCategorySearch(event.target.value)}
@@ -487,12 +613,19 @@ export const AdminDashboard = () => {
               />
             </div>
             <div className="mt-5 space-y-3">
-              {filteredCategories.length === 0 && <p className="text-white/65">Nenhuma categoria encontrada.</p>}
+              {filteredCategories.length === 0 && (
+                <p className="text-white/65">Nenhuma categoria encontrada.</p>
+              )}
               {filteredCategories.map(category => (
-                <div key={category.id} className="flex items-center justify-between rounded-2xl border border-white/15 p-3">
+                <div
+                  key={category.id}
+                  className="flex items-center justify-between rounded-2xl border border-white/15 p-3"
+                >
                   <div>
                     <h3 className="text-lg">{category.name}</h3>
-                    <p className="text-xs uppercase tracking-[0.14em] text-white/55">{category.slug}</p>
+                    <p className="text-xs uppercase tracking-[0.14em] text-white/55">
+                      {category.slug}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -518,17 +651,29 @@ export const AdminDashboard = () => {
       {activeOrganizationId && (
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <section className="glass-panel rounded-3xl p-6">
-            <h2 className="text-3xl">{editingProductId ? 'Editar Produto' : 'Novo Produto'}</h2>
+            <h2 className="text-3xl">
+              {editingProductId ? 'Editar Produto' : 'Novo Produto'}
+            </h2>
             <form onSubmit={handleProductSubmit} className="mt-5 grid gap-3">
               <input
                 value={productForm.name}
-                onChange={event => setProductForm(prev => ({ ...prev, name: event.target.value }))}
+                onChange={event =>
+                  setProductForm(prev => ({
+                    ...prev,
+                    name: event.target.value,
+                  }))
+                }
                 placeholder="Nome"
                 className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
               />
               <textarea
                 value={productForm.description}
-                onChange={event => setProductForm(prev => ({ ...prev, description: event.target.value }))}
+                onChange={event =>
+                  setProductForm(prev => ({
+                    ...prev,
+                    description: event.target.value,
+                  }))
+                }
                 placeholder="Descricao"
                 rows={3}
                 className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
@@ -538,7 +683,12 @@ export const AdminDashboard = () => {
                   type="number"
                   step="0.01"
                   value={productForm.price}
-                  onChange={event => setProductForm(prev => ({ ...prev, price: event.target.value }))}
+                  onChange={event =>
+                    setProductForm(prev => ({
+                      ...prev,
+                      price: event.target.value,
+                    }))
+                  }
                   placeholder="Preco"
                   className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
                 />
@@ -546,7 +696,12 @@ export const AdminDashboard = () => {
                   type="number"
                   min="0"
                   value={productForm.stock_quantity}
-                  onChange={event => setProductForm(prev => ({ ...prev, stock_quantity: event.target.value }))}
+                  onChange={event =>
+                    setProductForm(prev => ({
+                      ...prev,
+                      stock_quantity: event.target.value,
+                    }))
+                  }
                   placeholder="Estoque"
                   className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
                 />
@@ -554,13 +709,23 @@ export const AdminDashboard = () => {
               <div className="grid gap-3 sm:grid-cols-2">
                 <input
                   value={productForm.type}
-                  onChange={event => setProductForm(prev => ({ ...prev, type: event.target.value }))}
+                  onChange={event =>
+                    setProductForm(prev => ({
+                      ...prev,
+                      type: event.target.value,
+                    }))
+                  }
                   placeholder="Tipo"
                   className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
                 />
                 <input
                   value={productForm.volume}
-                  onChange={event => setProductForm(prev => ({ ...prev, volume: event.target.value }))}
+                  onChange={event =>
+                    setProductForm(prev => ({
+                      ...prev,
+                      volume: event.target.value,
+                    }))
+                  }
                   placeholder="Volume"
                   className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
                 />
@@ -568,30 +733,50 @@ export const AdminDashboard = () => {
               <div className="grid gap-3 sm:grid-cols-2">
                 <input
                   value={productForm.image_url}
-                  onChange={event => setProductForm(prev => ({ ...prev, image_url: event.target.value }))}
+                  onChange={event =>
+                    setProductForm(prev => ({
+                      ...prev,
+                      image_url: event.target.value,
+                    }))
+                  }
                   placeholder="URL da imagem"
                   className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
                 />
                 <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-sm text-white/90">
                   <Upload size={14} />
-                  {uploadImageMutation.isPending ? 'Enviando...' : 'Upload imagem'}
+                  {uploadImageMutation.isPending
+                    ? 'Enviando...'
+                    : 'Upload imagem'}
                   <input
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={event => handleImageUpload(event.target.files?.[0])}
+                    onChange={event =>
+                      handleImageUpload(event.target.files?.[0])
+                    }
                     disabled={uploadImageMutation.isPending}
                   />
                 </label>
               </div>
               <select
                 value={productForm.category_id}
-                onChange={event => setProductForm(prev => ({ ...prev, category_id: event.target.value }))}
+                onChange={event =>
+                  setProductForm(prev => ({
+                    ...prev,
+                    category_id: event.target.value,
+                  }))
+                }
                 className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
               >
-                <option value="" className="bg-slate-900">Sem categoria</option>
+                <option value="" className="bg-slate-900">
+                  Sem categoria
+                </option>
                 {categoryOptions.map(category => (
-                  <option key={category.id} value={category.id} className="bg-slate-900">
+                  <option
+                    key={category.id}
+                    value={category.id}
+                    className="bg-slate-900"
+                  >
                     {category.name}
                   </option>
                 ))}
@@ -600,7 +785,12 @@ export const AdminDashboard = () => {
                 <input
                   type="checkbox"
                   checked={productForm.is_active}
-                  onChange={event => setProductForm(prev => ({ ...prev, is_active: event.target.checked }))}
+                  onChange={event =>
+                    setProductForm(prev => ({
+                      ...prev,
+                      is_active: event.target.checked,
+                    }))
+                  }
                 />
                 Produto ativo
               </label>
@@ -631,7 +821,10 @@ export const AdminDashboard = () => {
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="relative">
-                <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/50" />
+                <Search
+                  size={15}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/50"
+                />
                 <input
                   value={productSearch}
                   onChange={event => {
@@ -645,30 +838,48 @@ export const AdminDashboard = () => {
               <select
                 value={statusFilter}
                 onChange={event => {
-                  setStatusFilter(event.target.value as 'all' | 'active' | 'inactive')
+                  setStatusFilter(
+                    event.target.value as 'all' | 'active' | 'inactive'
+                  )
                   setCurrentPage(1)
                 }}
                 className="rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
               >
-                <option value="all" className="bg-slate-900">Todos</option>
-                <option value="active" className="bg-slate-900">Ativos</option>
-                <option value="inactive" className="bg-slate-900">Inativos</option>
+                <option value="all" className="bg-slate-900">
+                  Todos
+                </option>
+                <option value="active" className="bg-slate-900">
+                  Ativos
+                </option>
+                <option value="inactive" className="bg-slate-900">
+                  Inativos
+                </option>
               </select>
             </div>
 
             <div className="mt-5 space-y-3">
-              {paginatedProducts.length === 0 && <p className="text-white/65">Nenhum produto encontrado.</p>}
+              {paginatedProducts.length === 0 && (
+                <p className="text-white/65">Nenhum produto encontrado.</p>
+              )}
               {paginatedProducts.map(product => (
-                <div key={product.id} className="flex items-center gap-4 rounded-2xl border border-white/15 p-3">
+                <div
+                  key={product.id}
+                  className="flex items-center gap-4 rounded-2xl border border-white/15 p-3"
+                >
                   <img
-                    src={product.image_url || 'https://images.unsplash.com/photo-1563170351-be82bc888aa4?q=80&w=300&auto=format&fit=crop'}
+                    src={
+                      product.image_url ||
+                      'https://images.unsplash.com/photo-1563170351-be82bc888aa4?q=80&w=300&auto=format&fit=crop'
+                    }
                     alt={product.name}
                     className="h-16 w-16 rounded-xl object-cover"
                   />
                   <div className="flex-1">
                     <h3 className="text-lg">{product.name}</h3>
                     <p className="text-sm text-white/70">
-                      ${Number(product.price).toFixed(2)} | estoque {product.stock_quantity} | {product.is_active ? 'ativo' : 'inativo'}
+                      ${Number(product.price).toFixed(2)} | estoque{' '}
+                      {product.stock_quantity} |{' '}
+                      {product.is_active ? 'ativo' : 'inativo'}
                     </p>
                   </div>
                   <button
@@ -694,14 +905,18 @@ export const AdminDashboard = () => {
                 </p>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    onClick={() =>
+                      setCurrentPage(prev => Math.max(1, prev - 1))
+                    }
                     disabled={safePage === 1}
                     className="rounded-full border border-white/25 px-4 py-2 text-xs uppercase tracking-[0.16em] text-white/85 disabled:opacity-40"
                   >
                     Anterior
                   </button>
                   <button
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    onClick={() =>
+                      setCurrentPage(prev => Math.min(totalPages, prev + 1))
+                    }
                     disabled={safePage === totalPages}
                     className="rounded-full border border-white/25 px-4 py-2 text-xs uppercase tracking-[0.16em] text-white/85 disabled:opacity-40"
                   >
@@ -714,14 +929,23 @@ export const AdminDashboard = () => {
         </div>
       )}
 
-      <SceneBuilderSection organizationId={activeOrganizationId} products={products as Product[]} />
+      {activeOrganizationId && (
+        <BrandingSection organizationId={activeOrganizationId} />
+      )}
+
+      <SceneBuilderSection
+        organizationId={activeOrganizationId}
+        products={products as Product[]}
+      />
 
       {confirmDelete && (
         <div className="fixed inset-0 z-[120] grid place-items-center bg-black/70 px-4">
           <div className="glass-panel w-full max-w-md rounded-3xl border border-white/20 p-6">
             <h3 className="text-2xl text-white">Confirmar exclusao</h3>
             <p className="mt-2 text-sm text-white/70">
-              Deseja excluir {confirmDelete.entity === 'product' ? 'o produto' : 'a categoria'} <strong>{confirmDelete.name}</strong>?
+              Deseja excluir{' '}
+              {confirmDelete.entity === 'product' ? 'o produto' : 'a categoria'}{' '}
+              <strong>{confirmDelete.name}</strong>?
             </p>
             <div className="mt-6 flex items-center justify-end gap-2">
               <button

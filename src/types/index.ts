@@ -76,7 +76,14 @@ export interface Order {
   customer_id?: string
   user_id?: string
   total_amount: number
-  status: 'pending' | 'paid' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  status:
+    | 'pending'
+    | 'paid'
+    | 'confirmed'
+    | 'processing'
+    | 'shipped'
+    | 'delivered'
+    | 'cancelled'
   payment_method?: string
   tracking_code?: string
   notes?: string
@@ -180,6 +187,33 @@ export interface StoreTheme {
   name: string
   tokens: Record<string, unknown>
   is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface TenantBranding {
+  id: string
+  organization_id: string
+  public_name?: string | null
+  logo_url?: string | null
+  favicon_url?: string | null
+  primary_color?: string | null
+  secondary_color?: string | null
+  accent_color?: string | null
+  font_family?: string | null
+  meta: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+export interface OrganizationDomain {
+  id: string
+  organization_id: string
+  domain: string
+  status: 'pending' | 'verified' | 'failed'
+  verification_token: string
+  validated_at?: string | null
+  is_primary: boolean
   created_at: string
   updated_at: string
 }
