@@ -80,8 +80,8 @@ export const productService = {
   },
 
   async uploadImage(file: File) {
-    const ext = file.name.split('.').pop()
-    const fileName = `${Date.now()}.${ext}`
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'bin'
+    const fileName = `${crypto.randomUUID()}.${ext}`
     const { data, error } = await supabase.storage
       .from('products')
       .upload(fileName, file)

@@ -1,10 +1,12 @@
-﻿import { useMemo } from 'react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { Product } from '@/types'
 import { CinematicButton } from '@/components/cinematic/CinematicButton'
 import { FALLBACK_PRODUCT_IMAGE } from '@/app/constants'
+import { ROUTES } from '@/routes'
+import { formatPrice } from '@/utils/format'
 
 interface CinematicHeroProps {
   products: Product[]
@@ -21,12 +23,17 @@ export const CinematicHero = ({
 }: CinematicHeroProps) => {
   const { scrollYProgress } = useScroll()
   const y = useTransform(scrollYProgress, [0, 0.5], [0, -100])
+  const hasProducts = products.length > 0
 
   const activeProduct = useMemo(
     () =>
       products.find(product => product.id === activeProductId) ?? products[0],
     [activeProductId, products]
   )
+
+  const priceLabel = hasProducts
+    ? formatPrice(activeProduct?.price ?? 0)
+    : 'Catalogo em atualizacao'
 
   return (
     <section className="relative flex min-h-[110vh] items-center overflow-hidden px-5 pb-10 pt-28 md:px-10">
@@ -46,7 +53,7 @@ export const CinematicHero = ({
             transition={{ duration: 0.6 }}
             className="mb-4 text-sm uppercase tracking-[0.35em] text-white/70"
           >
-            Products Reimagined
+            Colecao em movimento
           </motion.p>
 
           <AnimatePresence mode="wait">
@@ -58,11 +65,11 @@ export const CinematicHero = ({
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             >
               <h1 className="text-6xl leading-[0.9] text-white md:text-8xl">
-                {activeProduct?.name || 'Flagship Collection'}
+                {activeProduct?.name || 'Colecao em destaque'}
               </h1>
               <p className="mt-6 max-w-xl text-lg text-slate-200 md:text-2xl">
                 {activeProduct?.description ||
-                  'Uma experiência premium com narrativa visual e performance sólida.'}
+                  'Uma experiencia premium com narrativa visual, atmosfera imersiva e performance solida.'}
               </p>
             </motion.div>
           </AnimatePresence>
@@ -73,20 +80,27 @@ export const CinematicHero = ({
             transition={{ delay: 0.25, duration: 0.7 }}
             className="mt-10 flex flex-wrap items-center gap-4"
           >
-            <Link to="/products">
+            <Link to={ROUTES.PRODUCTS}>
               <CinematicButton
                 tone="accent"
                 className="inline-flex items-center gap-2"
                 onClick={onPrimaryCtaClick}
               >
-                Comprar Agora
+                Explorar catalogo
                 <ArrowRight size={18} />
               </CinematicButton>
             </Link>
             <span className="rounded-full border border-white/20 px-5 py-2 text-sm text-white/80">
-              A partir de ${activeProduct?.price?.toFixed(2) || '0.00'}
+              {hasProducts ? `A partir de ${priceLabel}` : priceLabel}
             </span>
           </motion.div>
+
+          {!hasProducts && (
+            <p className="mt-5 max-w-xl text-sm text-white/65">
+              Adicione produtos no painel administrativo para destacar a vitrine
+              principal com conteudo dinamico.
+            </p>
+          )}
 
           {products.length > 1 && (
             <div className="mt-8 flex flex-wrap gap-3">
@@ -95,6 +109,8 @@ export const CinematicHero = ({
                 return (
                   <button
                     key={product.id}
+                    type="button"
+                    aria-pressed={isActive}
                     onClick={() => onSelectProduct(product.id)}
                     className={`rounded-full px-4 py-2 text-sm transition-all ${
                       isActive
@@ -128,7 +144,7 @@ export const CinematicHero = ({
             <div className="glass-panel relative rounded-[2.5rem] p-5">
               <img
                 src={activeProduct?.image_url || FALLBACK_PRODUCT_IMAGE}
-                alt={activeProduct?.name || 'Featured product'}
+                alt={activeProduct?.name || 'Produto em destaque'}
                 loading="eager"
                 decoding="async"
                 onError={event => {

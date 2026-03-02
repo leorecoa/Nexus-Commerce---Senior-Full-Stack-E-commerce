@@ -13,7 +13,8 @@
     "migrations:check": "node scripts/check-migrations.js",
     "secrets:scan": "node scripts/secrets-scan.js",
     "type-check": "tsc --noEmit",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "prepare": "node scripts/prepare.js"

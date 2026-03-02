@@ -9,6 +9,7 @@ import { Category, Product } from '@/types'
 import { Save, Trash2, Edit, Plus, Upload, Search } from 'lucide-react'
 import { SceneBuilderSection } from './SceneBuilderSection'
 import { BrandingSection } from './BrandingSection'
+import { OperationsSection } from './OperationsSection'
 
 interface CategoryFormState {
   name: string
@@ -931,6 +932,10 @@ export const AdminDashboard = () => {
 
       {activeOrganizationId && (
         <BrandingSection organizationId={activeOrganizationId} />
+      )}
+
+      {activeOrganizationId && (
+        <OperationsSection organizationId={activeOrganizationId} />
       )}
 
       <SceneBuilderSection

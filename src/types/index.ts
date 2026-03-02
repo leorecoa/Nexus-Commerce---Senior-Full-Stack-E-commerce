@@ -246,3 +246,48 @@ export interface OrganizationDomain {
   created_at: string
   updated_at: string
 }
+
+export interface AnalyticsExport {
+  id: string
+  organization_id: string
+  requested_by?: string | null
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'canceled'
+  format: 'csv'
+  filters: Record<string, unknown>
+  storage_path?: string | null
+  download_url?: string | null
+  row_count?: number | null
+  error_message?: string | null
+  started_at?: string | null
+  finished_at?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface OrganizationWebhook {
+  id: string
+  organization_id: string
+  name: string
+  target_url: string
+  event_types: string[]
+  secret: string
+  status: 'active' | 'paused' | 'disabled'
+  timeout_ms: number
+  max_retries: number
+  headers: Record<string, unknown>
+  created_by?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface WebhookDeadLetter {
+  id: string
+  webhook_id?: string | null
+  event_type: string
+  payload: Record<string, unknown>
+  attempt_count: number
+  max_attempts: number
+  last_error?: string | null
+  dead_lettered_at?: string | null
+  created_at: string
+}
