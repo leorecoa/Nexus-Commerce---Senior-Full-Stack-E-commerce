@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+import { formatPrice } from '@/utils/format'
 
 interface BillingPlan {
   id: string
@@ -57,7 +58,7 @@ export const PricingPage = () => {
               {plan.description ?? 'Plano profissional para ecommerce premium.'}
             </p>
             <p className="mt-5 text-4xl">
-              ${(plan.price_monthly_cents / 100).toFixed(0)}
+              {formatPrice(plan.price_monthly_cents / 100)}
               <span className="text-base text-white/60">/month</span>
             </p>
             <p className="mt-2 text-xs uppercase tracking-[0.18em] text-cyan-300">

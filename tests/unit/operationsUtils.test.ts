@@ -49,6 +49,30 @@ describe('operationsUtils', () => {
     })
   })
 
+  it('allows editing a webhook without rotating the secret', () => {
+    expect(
+      parseWebhookForm(
+        {
+          name: ' Orders Hook ',
+          targetUrl: ' https://example.com/webhooks/orders ',
+          eventTypes: 'checkout.completed',
+          secret: '   ',
+          timeoutMs: '10000',
+          maxRetries: '8',
+          headersJson: '{}',
+        },
+        { requireSecret: false }
+      )
+    ).toEqual({
+      name: 'Orders Hook',
+      target_url: 'https://example.com/webhooks/orders',
+      event_types: ['checkout.completed'],
+      timeout_ms: 10000,
+      max_retries: 8,
+      headers: {},
+    })
+  })
+
   it('builds a form state from an existing webhook', () => {
     expect(
       buildWebhookFormState({
@@ -69,7 +93,7 @@ describe('operationsUtils', () => {
       name: 'Orders Hook',
       targetUrl: 'https://example.com/webhooks/orders',
       eventTypes: 'checkout.completed',
-      secret: 'super-secret',
+      secret: '',
       timeoutMs: '10000',
       maxRetries: '8',
       headersJson: '{\n  "x-source": "nexus"\n}',

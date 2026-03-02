@@ -11,6 +11,7 @@ import { useExperimentStore } from '@/stores/experimentStore'
 import { useAuthStore } from '@/stores/authStore'
 import { CinematicButton } from '@/components/cinematic/CinematicButton'
 import { FALLBACK_PRODUCT_IMAGE } from '@/app/constants'
+import { formatPrice } from '@/utils/format'
 
 const PAGE_SIZE = 6
 
@@ -203,7 +204,7 @@ export const ProductsPage = () => {
 
                     <div className="mt-4 flex items-center justify-between gap-3">
                       <p className="text-2xl font-semibold text-white">
-                        ${product.price.toFixed(2)}
+                        {formatPrice(product.price)}
                       </p>
                       <CinematicButton
                         tone="accent"

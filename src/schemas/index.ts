@@ -40,15 +40,15 @@ export const checkoutSchema = z.object({
     )
     .min(1, 'Cart cannot be empty'),
   shipping_address: z.object({
-    street: z.string(),
-    number: z.string(),
+    street: z.string().min(1, 'Street is required'),
+    number: z.string().min(1, 'Number is required'),
     complement: z.string().optional(),
-    neighborhood: z.string(),
-    city: z.string(),
-    state: z.string(),
-    zip: z.string(),
+    neighborhood: z.string().min(1, 'Neighborhood is required'),
+    city: z.string().min(1, 'City is required'),
+    state: z.string().length(2, 'State must have 2 characters'),
+    zip: z.string().min(5, 'ZIP code is required'),
   }),
-  payment_method: z.string().optional(),
+  payment_method: z.string().min(1, 'Payment method is required').optional(),
   use_wallet_balance: z.boolean().default(false),
 })
 

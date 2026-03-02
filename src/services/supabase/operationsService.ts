@@ -5,6 +5,9 @@ import {
   WebhookDeadLetter,
 } from '@/types'
 
+const WEBHOOK_PUBLIC_COLUMNS =
+  'id, organization_id, name, target_url, event_types, status, timeout_ms, max_retries, headers, created_by, created_at, updated_at'
+
 interface RequestExportInput {
   lookbackDays?: number
 }
@@ -54,7 +57,7 @@ export const operationsService = {
   async getWebhooks(organizationId: string) {
     const { data, error } = await supabase
       .from('organization_webhooks')
-      .select('*')
+      .select(WEBHOOK_PUBLIC_COLUMNS)
       .eq('organization_id', organizationId)
       .order('created_at', { ascending: false })
 
@@ -75,7 +78,7 @@ export const operationsService = {
         max_retries: input.max_retries ?? 8,
         headers: input.headers ?? {},
       })
-      .select('*')
+      .select(WEBHOOK_PUBLIC_COLUMNS)
       .single()
 
     if (error) throw error
@@ -128,7 +131,7 @@ export const operationsService = {
       .update(payload)
       .eq('id', webhookId)
       .eq('organization_id', organizationId)
-      .select('*')
+      .select(WEBHOOK_PUBLIC_COLUMNS)
       .single()
 
     if (error) throw error

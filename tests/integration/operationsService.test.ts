@@ -14,6 +14,9 @@ vi.mock('@/lib/supabase', () => ({
 
 import { operationsService } from '@/services/supabase/operationsService'
 
+const WEBHOOK_PUBLIC_COLUMNS =
+  'id, organization_id, name, target_url, event_types, status, timeout_ms, max_retries, headers, created_by, created_at, updated_at'
+
 describe('operationsService', () => {
   beforeEach(() => {
     supabaseMocks.from.mockReset()
@@ -84,6 +87,7 @@ describe('operationsService', () => {
       max_retries: 8,
       headers: {},
     })
+    expect(selectMock).toHaveBeenCalledWith(WEBHOOK_PUBLIC_COLUMNS)
   })
 
   it('updates webhook fields with a sanitized payload', async () => {
@@ -128,6 +132,7 @@ describe('operationsService', () => {
     })
     expect(eqIdMock).toHaveBeenCalledWith('id', 'wh-1')
     expect(eqOrgMock).toHaveBeenCalledWith('organization_id', 'org-1')
+    expect(selectMock).toHaveBeenCalledWith(WEBHOOK_PUBLIC_COLUMNS)
   })
 
   it('loads dead-letter deliveries from the rpc helper', async () => {

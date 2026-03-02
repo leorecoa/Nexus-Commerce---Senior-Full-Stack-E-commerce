@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useCartStore } from '@/stores/cartStore'
 import { Trash2 } from 'lucide-react'
+import { formatPrice } from '@/utils/format'
 
 export const CartPage = () => {
   const navigate = useNavigate()
@@ -36,7 +37,7 @@ export const CartPage = () => {
             />
             <div className="flex-1">
               <h3 className="text-2xl">{item.product.name}</h3>
-              <p className="text-white/70">${item.product.price}</p>
+              <p className="text-white/70">{formatPrice(item.product.price)}</p>
             </div>
             <input
               type="number"
@@ -62,7 +63,7 @@ export const CartPage = () => {
       <div className="mt-8 border-t border-white/20 pt-4">
         <div className="mb-4 flex items-center justify-between">
           <span className="text-2xl">Total:</span>
-          <span className="text-2xl">${getTotal().toFixed(2)}</span>
+          <span className="text-2xl">{formatPrice(getTotal())}</span>
         </div>
         <button
           onClick={() => navigate('/checkout')}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Product } from '@/types'
 import { FALLBACK_PRODUCT_IMAGE } from '@/app/constants'
+import { formatPrice } from '@/utils/format'
 
 interface ImmersiveProductShowcaseProps {
   products: Product[]
@@ -63,7 +64,7 @@ export const ImmersiveProductShowcase = ({
                 </p>
                 <h3 className="mt-2 text-3xl text-white">{product.name}</h3>
                 <p className="mt-2 text-sm text-white/70">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </p>
               </div>
             </motion.article>

@@ -270,7 +270,7 @@ export interface OrganizationWebhook {
   name: string
   target_url: string
   event_types: string[]
-  secret: string
+  secret?: string | null
   status: 'active' | 'paused' | 'disabled'
   timeout_ms: number
   max_retries: number

@@ -25,6 +25,10 @@ interface OperationsSectionProps {
   organizationId: string
 }
 
+type CreateWebhookPayload = NormalizedWebhookFormInput & {
+  secret: string
+}
+
 export const OperationsSection = ({
   organizationId,
 }: OperationsSectionProps) => {
@@ -32,6 +36,7 @@ export const OperationsSection = ({
   const addToast = useToastStore(state => state.addToast)
   const [lookbackDays, setLookbackDays] = useState('30')
   const [editingWebhookId, setEditingWebhookId] = useState<string | null>(null)
+  const [retryingDeliveryIds, setRetryingDeliveryIds] = useState<string[]>([])
   const [webhookForm, setWebhookForm] =
     useState<WebhookFormState>(defaultWebhookForm)
 
@@ -79,7 +84,7 @@ export const OperationsSection = ({
   })
 
   const createWebhookMutation = useMutation({
-    mutationFn: (input: NormalizedWebhookFormInput) =>
+    mutationFn: (input: CreateWebhookPayload) =>
       operationsService.createWebhook(organizationId, input),
     onSuccess: () => {
       setEditingWebhookId(null)
@@ -189,6 +194,9 @@ export const OperationsSection = ({
   const retryDeadLetterMutation = useMutation({
     mutationFn: (deliveryId: string) =>
       operationsService.retryDeadLetterWebhook(organizationId, deliveryId),
+    onMutate: deliveryId => {
+      setRetryingDeliveryIds(current => [...current, deliveryId])
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['webhook-dead-letters', organizationId],
@@ -206,6 +214,11 @@ export const OperationsSection = ({
           error instanceof Error ? error.message : 'Tente novamente.',
         variant: 'error',
       })
+    },
+    onSettled: (_data, _error, deliveryId) => {
+      setRetryingDeliveryIds(current =>
+        current.filter(currentId => currentId !== deliveryId)
+      )
     },
   })
 
@@ -230,7 +243,9 @@ export const OperationsSection = ({
 
     let parsed: NormalizedWebhookFormInput
     try {
-      parsed = parseWebhookForm(webhookForm)
+      parsed = parseWebhookForm(webhookForm, {
+        requireSecret: !editingWebhookId,
+      })
     } catch (error) {
       addToast({
         title: 'Configuracao invalida',
@@ -246,7 +261,10 @@ export const OperationsSection = ({
       return
     }
 
-    createWebhookMutation.mutate(parsed)
+    createWebhookMutation.mutate({
+      ...parsed,
+      secret: parsed.secret!,
+    })
   }
 
   const startWebhookEdit = (webhook: OrganizationWebhook) => {
@@ -379,13 +397,23 @@ export const OperationsSection = ({
             className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
           />
           <input
+            type="password"
             value={webhookForm.secret}
             onChange={event =>
               setWebhookForm(prev => ({ ...prev, secret: event.target.value }))
             }
-            placeholder="Segredo HMAC"
+            placeholder={
+              editingWebhookId
+                ? 'Novo segredo HMAC (opcional)'
+                : 'Segredo HMAC'
+            }
             className="w-full rounded-xl border border-white/20 bg-slate-900/70 px-3 py-2 text-white"
           />
+          {editingWebhookId && (
+            <p className="-mt-1 text-xs text-white/60">
+              Deixe em branco para manter o segredo atual.
+            </p>
+          )}
           <div className="grid gap-3 sm:grid-cols-2">
             <input
               type="number"
@@ -528,33 +556,37 @@ export const OperationsSection = ({
                 Nenhuma delivery em dead-letter.
               </p>
             )}
-            {(deadLetters as WebhookDeadLetter[]).map(item => (
-              <div
-                key={item.id}
-                className="rounded-2xl border border-white/10 bg-slate-950/40 p-3 text-sm"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-medium text-white">{item.event_type}</p>
-                  <p className="text-xs uppercase tracking-[0.14em] text-white/60">
-                    {formatDateTime(item.dead_lettered_at || item.created_at)}
-                  </p>
-                </div>
-                <p className="mt-1 text-white/70">
-                  tentativas {item.attempt_count}/{item.max_attempts}
-                </p>
-                {item.last_error && (
-                  <p className="mt-1 text-red-200">{item.last_error}</p>
-                )}
-                <button
-                  onClick={() => retryDeadLetterMutation.mutate(item.id)}
-                  disabled={retryDeadLetterMutation.isPending}
-                  className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs uppercase tracking-[0.14em] text-white/85 disabled:opacity-60"
+            {(deadLetters as WebhookDeadLetter[]).map(item => {
+              const isRetryingItem = retryingDeliveryIds.includes(item.id)
+
+              return (
+                <div
+                  key={item.id}
+                  className="rounded-2xl border border-white/10 bg-slate-950/40 p-3 text-sm"
                 >
-                  <RotateCcw size={14} />
-                  Reenfileirar
-                </button>
-              </div>
-            ))}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="font-medium text-white">{item.event_type}</p>
+                    <p className="text-xs uppercase tracking-[0.14em] text-white/60">
+                      {formatDateTime(item.dead_lettered_at || item.created_at)}
+                    </p>
+                  </div>
+                  <p className="mt-1 text-white/70">
+                    tentativas {item.attempt_count}/{item.max_attempts}
+                  </p>
+                  {item.last_error && (
+                    <p className="mt-1 text-red-200">{item.last_error}</p>
+                  )}
+                  <button
+                    onClick={() => retryDeadLetterMutation.mutate(item.id)}
+                    disabled={isRetryingItem}
+                    className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-xs uppercase tracking-[0.14em] text-white/85 disabled:opacity-60"
+                  >
+                    <RotateCcw size={14} />
+                    {isRetryingItem ? 'Reenfileirando...' : 'Reenfileirar'}
+                  </button>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>

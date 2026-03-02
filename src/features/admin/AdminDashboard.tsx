@@ -7,6 +7,7 @@ import { useTenantStore } from '@/stores/tenantStore'
 import { useToastStore } from '@/stores/toastStore'
 import { Category, Product } from '@/types'
 import { Save, Trash2, Edit, Plus, Upload, Search } from 'lucide-react'
+import { formatPrice } from '@/utils/format'
 import { SceneBuilderSection } from './SceneBuilderSection'
 import { BrandingSection } from './BrandingSection'
 import { OperationsSection } from './OperationsSection'
@@ -502,7 +503,7 @@ export const AdminDashboard = () => {
             <p className="text-xs uppercase tracking-[0.16em] text-white/60">
               AOV
             </p>
-            <p className="mt-2 text-3xl">${Number(kpis.aov).toFixed(2)}</p>
+            <p className="mt-2 text-3xl">{formatPrice(Number(kpis.aov))}</p>
           </div>
           <div className="glass-panel rounded-2xl p-4">
             <p className="text-xs uppercase tracking-[0.16em] text-white/60">
@@ -878,7 +879,7 @@ export const AdminDashboard = () => {
                   <div className="flex-1">
                     <h3 className="text-lg">{product.name}</h3>
                     <p className="text-sm text-white/70">
-                      ${Number(product.price).toFixed(2)} | estoque{' '}
+                      {formatPrice(Number(product.price))} | estoque{' '}
                       {product.stock_quantity} |{' '}
                       {product.is_active ? 'ativo' : 'inativo'}
                     </p>

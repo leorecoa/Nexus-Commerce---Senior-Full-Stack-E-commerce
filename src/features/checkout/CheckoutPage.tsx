@@ -8,6 +8,7 @@ import { experimentService } from '@/services/supabase/experimentService'
 import { useTenantStore } from '@/stores/tenantStore'
 import { useExperimentStore } from '@/stores/experimentStore'
 import { useAuthStore } from '@/stores/authStore'
+import { formatPrice } from '@/utils/format'
 
 interface CheckoutFormState {
   street: string
@@ -151,12 +152,12 @@ export const CheckoutPage = () => {
             <span>
               {item.product.name} x {item.quantity}
             </span>
-            <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+            <span>{formatPrice(item.product.price * item.quantity)}</span>
           </div>
         ))}
         <div className="mt-4 flex justify-between border-t border-white/20 pt-4 text-xl">
           <span>Total:</span>
-          <span>${getTotal().toFixed(2)}</span>
+          <span>{formatPrice(getTotal())}</span>
         </div>
       </div>
 

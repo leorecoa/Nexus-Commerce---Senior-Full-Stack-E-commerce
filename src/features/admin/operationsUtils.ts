@@ -14,7 +14,7 @@ export interface NormalizedWebhookFormInput {
   name: string
   target_url: string
   event_types: string[]
-  secret: string
+  secret?: string
   timeout_ms: number
   max_retries: number
   headers: Record<string, string>
@@ -58,11 +58,15 @@ export const parseHeadersJson = (value: string) => {
 }
 
 export const parseWebhookForm = (
-  form: WebhookFormState
+  form: WebhookFormState,
+  options: {
+    requireSecret?: boolean
+  } = {}
 ): NormalizedWebhookFormInput => {
   const name = form.name.trim()
   const targetUrl = form.targetUrl.trim()
   const secret = form.secret.trim()
+  const requireSecret = options.requireSecret ?? true
 
   if (!name || !targetUrl) {
     throw new Error('Preencha nome e URL.')
@@ -74,7 +78,7 @@ export const parseWebhookForm = (
     throw new Error('URL invalida. Use um endpoint absoluto com http ou https.')
   }
 
-  if (!secret) {
+  if (requireSecret && !secret) {
     throw new Error('Secret obrigatorio.')
   }
 
@@ -92,7 +96,7 @@ export const parseWebhookForm = (
     name,
     target_url: targetUrl,
     event_types: formatEventTypes(form.eventTypes),
-    secret,
+    ...(secret ? { secret } : {}),
     timeout_ms: timeoutMs,
     max_retries: maxRetries,
     headers: parseHeadersJson(form.headersJson),
@@ -105,7 +109,7 @@ export const buildWebhookFormState = (
   name: webhook.name,
   targetUrl: webhook.target_url,
   eventTypes: webhook.event_types.join(', '),
-  secret: webhook.secret,
+  secret: '',
   timeoutMs: String(webhook.timeout_ms),
   maxRetries: String(webhook.max_retries),
   headersJson: JSON.stringify(webhook.headers ?? {}, null, 2),
